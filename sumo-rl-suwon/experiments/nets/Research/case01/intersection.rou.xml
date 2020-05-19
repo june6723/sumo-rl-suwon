@@ -1,0 +1,7 @@
+<routes>
+   <vType id="car" type="passenger" length="5" accel="3.5" decel="2.2" sigma="1.0"/>
+   <flow id="carflow01" type="car" beg="0" end="9999" vehsPerHour="650" from="-gneE3" to="gneE6" departLane="best" />
+   <flow id="carflow02" type="car" beg="0" end="9999" vehsPerHour="400" from="-gneE6" to="gneE3" departLane="best" />
+   <flow id="carflow03" type="car" beg="0" end="9999" vehsPerHour="60" from="-gneE6" to="gneE2" departLane="best" />
+   <flow id="carflow04" type="car" beg="0" end="9999" vehsPerHour="50" from="-gneE2" to="gneE3" departLane="best" />
+</routes>

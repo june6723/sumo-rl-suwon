@@ -1,0 +1,80 @@
+<routes>
+   <vType id="car" type="passenger" length="5" accel="3.5" decel="2.2" sigma="1.0"/>
+   <flow id="reverseflow01" type="car" beginin="0" end="3600" vehsPerHour="780" from="-gneE6" to="gneE14" departLane="best" />
+   <flow id="reverseflow02" type="car" begin="0" end="3600" vehsPerHour="480" from="-gneE14" to="gneE6" departLane="best" />
+   <flow id="reverseflow03" type="car" begin="0" end="3600" vehsPerHour="120" from="-gneE5" to="gneE7" departLane="best" />
+   <flow id="reverseflow04" type="car" begin="0" end="3600" vehsPerHour="140" from="-gneE7" to="gneE5" departLane="best" />
+   <flow id="reverseflow05" type="car" begin="0" end="3600" vehsPerHour="120" from="-gneE13" to="gneE16" departLane="best" />
+   <flow id="reverseflow06" type="car" begin="0" end="3600" vehsPerHour="140" from="-gneE16" to="gneE13" departLane="best" />
+   <flow id="reverseflow07" type="car" begin="0" end="3600" vehsPerHour="140" from="-gneE5" to="gneE13" departLane="best" />
+   <flow id="reverseflow08" type="car" begin="0" end="3600" vehsPerHour="80" from="-gneE12" to="gneE7" departLane="best" />
+   <flow id="reverseflow09" type="car" begin="0" end="3600" vehsPerHour="140" from="-gneE6" to="gneE5" departLane="best" />
+   <flow id="reverseflow10" type="car" begin="0" end="3600" vehsPerHour="120" from="-gneE10" to="gneE14" departLane="best" />
+   <flow id="reverseflow11" type="car" begin="0" end="3600" vehsPerHour="80" from="-gneE14" to="gneE16" departLane="best" />
+   <flow id="reverseflow12" type="car" begin="0" end="3600" vehsPerHour="60" from="-gneE7" to="gneE6" departLane="best" />
+   
+   <flow id="normalflow01" type="car" begin="3600" end="7200" vehsPerHour="400" from="-gneE6" to="gneE14" departLane="best" />
+   <flow id="normalflow02" type="car" begin="3600" end="7200" vehsPerHour="650" from="-gneE14" to="gneE6" departLane="best" />
+   <flow id="normalflow03" type="car" begin="3600" end="7200" vehsPerHour="120" from="-gneE5" to="gneE7" departLane="best" />
+   <flow id="normalflow04" type="car" begin="3600" end="7200" vehsPerHour="100" from="-gneE7" to="gneE5" departLane="best" />
+   <flow id="normalflow05" type="car" begin="3600" end="7200" vehsPerHour="120" from="-gneE13" to="gneE16" departLane="best" />
+   <flow id="normalflow06" type="car" begin="3600" end="7200" vehsPerHour="100" from="-gneE16" to="gneE13" departLane="best" />
+   <flow id="normalflow07" type="car" begin="3600" end="7200" vehsPerHour="120" from="-gneE5" to="gneE13" departLane="best" />
+   <flow id="normalflow08" type="car" begin="3600" end="7200" vehsPerHour="60" from="-gneE12" to="gneE7" departLane="best" />
+   <flow id="normalflow09" type="car" begin="3600" end="7200" vehsPerHour="120" from="-gneE6" to="gneE5" departLane="best" />
+   <flow id="normalflow10" type="car" begin="3600" end="7200" vehsPerHour="100" from="-gneE10" to="gneE14" departLane="best" />
+   <flow id="normalflow11" type="car" begin="3600" end="7200" vehsPerHour="60" from="-gneE14" to="gneE16" departLane="best" />
+   <flow id="normalflow12" type="car" begin="3600" end="7200" vehsPerHour="50" from="-gneE7" to="gneE6" departLane="best" />
+  
+   <flow id="busyflow01" type="car" begin="7200" end="10800" vehsPerHour="650" from="-gneE6" to="gneE14" departLane="best" />
+   <flow id="busyflow02" type="car" begin="7200" end="10800" vehsPerHour="400" from="-gneE14" to="gneE6" departLane="best" />
+   <flow id="busyflow03" type="car" begin="7200" end="10800" vehsPerHour="100" from="-gneE5" to="gneE7" departLane="best" />
+   <flow id="busyflow04" type="car" begin="7200" end="10800" vehsPerHour="120" from="-gneE7" to="gneE5" departLane="best" />
+   <flow id="busyflow05" type="car" begin="7200" end="10800" vehsPerHour="100" from="-gneE13" to="gneE16" departLane="best" />
+   <flow id="busyflow06" type="car" begin="7200" end="10800" vehsPerHour="120" from="-gneE16" to="gneE13" departLane="best" />
+   <flow id="busyflow07" type="car" begin="7200" end="10800" vehsPerHour="120" from="-gneE5" to="gneE13" departLane="best" />
+   <flow id="busyflow08" type="car" begin="7200" end="10800" vehsPerHour="60" from="-gneE12" to="gneE7" departLane="best" />
+   <flow id="busyflow09" type="car" begin="7200" end="10800" vehsPerHour="120" from="-gneE6" to="gneE5" departLane="best" />
+   <flow id="busyflow10" type="car" begin="7200" end="10800" vehsPerHour="100" from="-gneE10" to="gneE14" departLane="best" />
+   <flow id="busyflow11" type="car" begin="7200" end="10800" vehsPerHour="60" from="-gneE14" to="gneE16" departLane="best" />
+   <flow id="busyflow12" type="car" begin="7200" end="10800" vehsPerHour="50" from="-gneE7" to="gneE6" departLane="best" />
+
+   <flow id="reverse2flow01" type="car" begin="10800" end="14400" vehsPerHour="780" from="-gneE6" to="gneE14" departLane="best" />
+   <flow id="reverse2flow02" type="car" begin="10800" end="14400" vehsPerHour="480" from="-gneE14" to="gneE6" departLane="best" />
+   <flow id="reverse2flow03" type="car" begin="10800" end="14400" vehsPerHour="120" from="-gneE5" to="gneE7" departLane="best" />
+   <flow id="reverse2flow04" type="car" begin="10800" end="14400" vehsPerHour="140" from="-gneE7" to="gneE5" departLane="best" />
+   <flow id="reverse2flow05" type="car" begin="10800" end="14400" vehsPerHour="120" from="-gneE13" to="gneE16" departLane="best" />
+   <flow id="reverse2flow06" type="car" begin="10800" end="14400" vehsPerHour="140" from="-gneE16" to="gneE13" departLane="best" />
+   <flow id="reverse2flow07" type="car" begin="10800" end="14400" vehsPerHour="140" from="-gneE5" to="gneE13" departLane="best" />
+   <flow id="reverse2flow08" type="car" begin="10800" end="14400" vehsPerHour="80" from="-gneE12" to="gneE7" departLane="best" />
+   <flow id="reverse2flow09" type="car" begin="10800" end="14400" vehsPerHour="140" from="-gneE6" to="gneE5" departLane="best" />
+   <flow id="reverse2flow10" type="car" begin="10800" end="14400" vehsPerHour="120" from="-gneE10" to="gneE14" departLane="best" />
+   <flow id="reverse2flow11" type="car" begin="10800" end="14400" vehsPerHour="80" from="-gneE14" to="gneE16" departLane="best" />
+   <flow id="reverse2flow12" type="car" begin="10800" end="14400" vehsPerHour="60" from="-gneE7" to="gneE6" departLane="best" />
+   
+   <flow id="normal2flow01" type="car" begin="14400" end="18000" vehsPerHour="400" from="-gneE6" to="gneE14" departLane="best" />
+   <flow id="normal2flow02" type="car" begin="14400" end="18000" vehsPerHour="650" from="-gneE14" to="gneE6" departLane="best" />
+   <flow id="normal2flow03" type="car" begin="14400" end="18000" vehsPerHour="120" from="-gneE5" to="gneE7" departLane="best" />
+   <flow id="normal2flow04" type="car" begin="14400" end="18000" vehsPerHour="100" from="-gneE7" to="gneE5" departLane="best" />
+   <flow id="normal2flow05" type="car" begin="14400" end="18000" vehsPerHour="120" from="-gneE13" to="gneE16" departLane="best" />
+   <flow id="normal2flow06" type="car" begin="14400" end="18000" vehsPerHour="100" from="-gneE16" to="gneE13" departLane="best" />
+   <flow id="normal2flow07" type="car" begin="14400" end="18000" vehsPerHour="120" from="-gneE5" to="gneE13" departLane="best" />
+   <flow id="normal2flow08" type="car" begin="14400" end="18000" vehsPerHour="60" from="-gneE12" to="gneE7" departLane="best" />
+   <flow id="normal2flow09" type="car" begin="14400" end="18000" vehsPerHour="120" from="-gneE6" to="gneE5" departLane="best" />
+   <flow id="normal2flow10" type="car" begin="14400" end="18000" vehsPerHour="100" from="-gneE10" to="gneE14" departLane="best" />
+   <flow id="normal2flow11" type="car" begin="14400" end="18000" vehsPerHour="60" from="-gneE14" to="gneE16" departLane="best" />
+   <flow id="normal2flow12" type="car" begin="14400" end="18000" vehsPerHour="50" from="-gneE7" to="gneE6" departLane="best" />
+  
+   <flow id="busy2flow01" type="car" begin="18000" end="21600" vehsPerHour="650" from="-gneE6" to="gneE14" departLane="best" />
+   <flow id="busy2flow02" type="car" begin="18000" end="21600" vehsPerHour="400" from="-gneE14" to="gneE6" departLane="best" />
+   <flow id="busy2flow03" type="car" begin="18000" end="21600" vehsPerHour="100" from="-gneE5" to="gneE7" departLane="best" />
+   <flow id="busy2flow04" type="car" begin="18000" end="21600" vehsPerHour="120" from="-gneE7" to="gneE5" departLane="best" />
+   <flow id="busy2flow05" type="car" begin="18000" end="21600" vehsPerHour="100" from="-gneE13" to="gneE16" departLane="best" />
+   <flow id="busy2flow06" type="car" begin="18000" end="21600" vehsPerHour="120" from="-gneE16" to="gneE13" departLane="best" />
+   <flow id="busy2flow07" type="car" begin="18000" end="21600" vehsPerHour="120" from="-gneE5" to="gneE13" departLane="best" />
+   <flow id="busy2flow08" type="car" begin="18000" end="21600" vehsPerHour="60" from="-gneE12" to="gneE7" departLane="best" />
+   <flow id="busy2flow09" type="car" begin="18000" end="21600" vehsPerHour="120" from="-gneE6" to="gneE5" departLane="best" />
+   <flow id="busy2flow10" type="car" begin="18000" end="21600" vehsPerHour="100" from="-gneE10" to="gneE14" departLane="best" />
+   <flow id="busy2flow11" type="car" begin="18000" end="21600" vehsPerHour="60" from="-gneE14" to="gneE16" departLane="best" />
+   <flow id="busy2flow12" type="car" begin="18000" end="21600" vehsPerHour="50" from="-gneE7" to="gneE6" departLane="best" />
+</routes>
