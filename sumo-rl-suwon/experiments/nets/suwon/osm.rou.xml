@@ -1,0 +1,38 @@
+﻿<routes>
+<vType id="car" type="passenger" length="5" accel="3.5" decel="2.2" sigma="1.0"/>
+
+<flow id="carflow01" type="car" beg="0" end="39600" vehsPerHour="1500" from="667354421" to="667354420" departLane="best" />
+<flow id="carflow02" type="car" beg="0" end="39600" vehsPerHour="39" from=" 583307812#2" to="667354420" departLane="best" />
+<flow id="carflow03" type="car" beg="0" end="39600" vehsPerHour="520" from="706712811" to="667354420" via = "706712805"  departLane="best" />
+<flow id="carflow04" type="car" beg="0" end="39600" vehsPerHour="1" from="706712811" to="667354420" via = "741638791#0" departLane="best" />
+<flow id="carflow05" type="car" beg="0" end="39600" vehsPerHour="519" from="667354421" to="667354421" departLane="best" />
+<flow id="carflow06" type="car" beg="0" end="39600" vehsPerHour="26" from="-667354421" to="667354421" departLane="best" />
+<flow id="carflow07" type="car" beg="0" end="39600" vehsPerHour="519" from="583307812#2" to="667354421" via = "-706712805" departLane="best" />
+<flow id="carflow08" type="car" beg="0" end="39600" vehsPerHour="31" from="583307812#2" to="667354421" via = "-741638791#0" departLane="best" />
+<flow id="carflow09" type="car" beg="0" end="39600" vehsPerHour="319" from="-621392371#0" to="-583307812#2" departLane="best" />
+<flow id="carflow10" type="car" beg="0" end="39600" vehsPerHour="81" from="706712811" to="-583307812#2" departLane="best" />
+<flow id="carflow11" type="car" beg="0" end="39600" vehsPerHour="39" from="667354421" to="-583307812#2" via = "706712805" departLane="best" />
+<flow id="carflow12" type="car" beg="0" end="39600" vehsPerHour="81" from="667354421" to="-583307812#2" via = "741638791#0" departLane="best" />
+<flow id="carflow13" type="car" beg="0" end="39600" vehsPerHour="2941" from="-621392371#0" to="-667354421" via="-706712805" departLane="best" />
+<flow id="carflow14" type="car" beg="0" end="39600" vehsPerHour="56" from="706712811" to="-667354421" departLane="best" />
+<flow id="carflow15" type="car" beg="0" end="39600" vehsPerHour="26" from="583307812#2" to="-667354421" via = "706712805" departLane="best" />
+<flow id="carflow16" type="car" beg="0" end="39600" vehsPerHour="209" from="583307812#2" to="-667354421" via = "741638791#0" departLane="best" />
+
+<!-- <flow id="carflow01" type="car" beg="0" end="39600" vehsPerHour="300" from="667354421" to="667354420" departLane="best" />
+<flow id="carflow02" type="car" beg="0" end="39600" vehsPerHour="3" from=" 583307812#2" to="667354420" departLane="best" />
+<flow id="carflow03" type="car" beg="0" end="39600" vehsPerHour="31" from="706712811" to="667354420" via = "706712805"  departLane="best" />
+<flow id="carflow04" type="car" beg="0" end="39600" vehsPerHour="31" from="706712811" to="667354420" via = "741638791#0" departLane="best" />
+<flow id="carflow05" type="car" beg="0" end="39600" vehsPerHour="24" from="667354421" to="667354421" departLane="best" />
+<flow id="carflow06" type="car" beg="0" end="39600" vehsPerHour="1" from="-667354421" to="667354421" departLane="best" />
+<flow id="carflow07" type="car" beg="0" end="39600" vehsPerHour="24" from="583307812#2" to="667354421" via = "-706712805" departLane="best" />
+<flow id="carflow08" type="car" beg="0" end="39600" vehsPerHour="2" from="583307812#2" to="667354421" via = "-741638791#0" departLane="best" />
+<flow id="carflow09" type="car" beg="0" end="39600" vehsPerHour="31" from="-621392371#0" to="-583307812#2" departLane="best" />
+<flow id="carflow10" type="car" beg="0" end="39600" vehsPerHour="4" from="706712811" to="-583307812#2" departLane="best" />
+<flow id="carflow11" type="car" beg="0" end="39600" vehsPerHour="3" from="667354421" to="-583307812#2" via = "706712805" departLane="best" />
+<flow id="carflow12" type="car" beg="0" end="39600" vehsPerHour="4" from="667354421" to="-583307812#2" via = "741638791#0" departLane="best" />
+<flow id="carflow13" type="car" beg="0" end="39600" vehsPerHour="259" from="-621392371#0" to="-667354421" via="-706712805" departLane="best" />
+<flow id="carflow14" type="car" beg="0" end="39600" vehsPerHour="3" from="706712811" to="-667354421" departLane="best" />
+<flow id="carflow15" type="car" beg="0" end="39600" vehsPerHour="1" from="583307812#2" to="-667354421" via = "706712805" departLane="best" />
+<flow id="carflow16" type="car" beg="0" end="39600" vehsPerHour="6" from="583307812#2" to="-667354421" via = "741638791#0" departLane="best" /> -->
+
+</routes>
