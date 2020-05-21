@@ -18,14 +18,22 @@ class TrafficSignal:
         Logic = traci.trafficlight.getAllProgramLogics(self.id) # returns logics in tuple
         for phase in Logic[0].getPhases() :  # so first element of tuple
             phases.append(phase)
-            if 'G' in phase.state or 'g' in phase.state :
-                self.num_green_phases += 1
+            if 'y' in phase.state :
                 self.min_green.append(phase.minDur)
                 self.max_green.append(phase.maxDur)
             else :
+                self.num_green_phases += 1
                 self.min_green.append(phase.minDur)
                 self.max_green.append(phase.maxDur) 
         return phases
+
+    def _get_connected_lane(self, lane) :
+        connected_lane = [lane]
+        all_lanes_in_net = traci.lane.getIDList()
+        for lane in all_lanes_in_net :
+            if not ':' in lane and lane not in self.local_lane :
+
+        return connected_lane
 
     def __init__(self, env, ts_id, delta_time, yellow_time):
         self.id = ts_id
@@ -36,18 +44,18 @@ class TrafficSignal:
         # Bring phase information out of net file  
         self.phases = self._get_phase_info()
         self.time_on_phase = 0.0
-        self.delta_time = delta_time
-        self.lanes = list(dict.fromkeys(traci.trafficlight.getControlledLanes(self.id)))  # remove duplicates and keep order
+
+        #------------------------------------------
+
+        self.key_lanes = list(dict.fromkeys(traci.trafficlight.getControlledLanes(self.id)))  # remove duplicates and keep order
+        self.lanes = dict()
+        for lane in self.key_lanes :
+            self.lanes[lane] = self._get_connected_lane(lane)
         self.edges = self._compute_edges()
-        self.edges_capacity = self._compute_edges_capacity()
-        self.yellow_time = yellow_time
        
         logic = traci.trafficlight.Logic("new-program", 0, 0, phases=self.phases)
         traci.trafficlight.setCompleteRedYellowGreenDefinition(self.id, logic)
 
-        l = traci.lane.getIDList()
-        # for lane in self.lanes :
-        info = traci.lane.getLinks('-gneE6_0')
         # addition
         self.duration_of_green_phase = dict() # key : GreenPhase number / value : list of duration
         for p in range(self.num_green_phases) :
@@ -189,18 +197,4 @@ class TrafficSignal:
             veh_list += traci.lane.getLastStepVehicleIDs(lane)
         return veh_list
 
-    @DeprecationWarning
-    def keep(self):
-        if self.time_on_phase >= self.max_green:
-            self.change()
-        else:
-            self.time_on_phase += self.delta_time
-            traci.trafficlight.setPhaseDuration(self.id, self.delta_time)
-
-    @DeprecationWarning
-    def change(self):
-        if self.time_on_phase < self.min_green:  # min green time => do not change
-            self.keep()
-        else:
-            self.time_on_phase = self.delta_time
-            traci.trafficlight.setPhaseDuration(self.id, 0)
+    

@@ -18,10 +18,17 @@ from sumo_rl.environment.env import SumoEnvironment
 import traci
 
 def policy_mapping(id):
-    if id == "left":
-        return "left"
-    else:
-        return "right"
+    if id == "3210041371":
+        return "3210041371"
+
+    elif id == "452397025":
+        return "452397025"
+
+    elif id == "4708662059":
+        return "4708662059"
+        
+    else :
+        return "5870232715"
 
 if __name__ == '__main__':
     ray.init()
