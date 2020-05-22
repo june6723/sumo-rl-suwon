@@ -27,15 +27,37 @@ class TrafficSignal:
                 self.max_green.append(phase.maxDur) 
         return phases
 
-    def _get_connected_lane(self, lane) :
-        connected_lane = [lane]
-        all_lanes_in_net = traci.lane.getIDList()
-        for lane in all_lanes_in_net :
-            if not ':' in lane and lane not in self.local_lane :
+    def _get_connected_lane(self, key_lane) :
+        connected_lane = [key_lane]
 
+        add_lane=self._add_lane_info(connected_lane)
+        connected_lane += add_lane
+        while(add_lane) :
+            add_lane=self._add_lane_info(connected_lane)
+            connected_lane += add_lane
+                
         return connected_lane
 
-    def __init__(self, env, ts_id, delta_time, yellow_time):
+    def _add_lane_info(self, connected_lane) :
+        add_lane = []
+        all_lanes_in_net = traci.lane.getIDList()
+        for lane in all_lanes_in_net :
+            if not ':' in lane and lane not in self.key_lanes :
+                link = traci.lane.getLinks(lane)
+                for index in link :
+                    if index[0] == connected_lane[-1] and self._judge_whether_internal_lane_is_in_ts(index[4]) and lane not in add_lane :
+                        add_lane.append(lane)        
+        return add_lane
+    
+    def _judge_whether_internal_lane_is_in_ts(self, internal_lane) :
+        judge = True
+        # for ts_id in self.env.ts_ids :
+        for ts_id in traci.trafficlight.getIDList() :
+            if ts_id in internal_lane :
+                judge = False
+        return judge
+
+    def __init__(self, env, ts_id):
         self.id = ts_id
         self.env = env
         self.num_green_phases = 0
@@ -44,15 +66,11 @@ class TrafficSignal:
         # Bring phase information out of net file  
         self.phases = self._get_phase_info()
         self.time_on_phase = 0.0
-
-        #------------------------------------------
-
         self.key_lanes = list(dict.fromkeys(traci.trafficlight.getControlledLanes(self.id)))  # remove duplicates and keep order
         self.lanes = dict()
         for lane in self.key_lanes :
             self.lanes[lane] = self._get_connected_lane(lane)
-        self.edges = self._compute_edges()
-       
+
         logic = traci.trafficlight.Logic("new-program", 0, 0, phases=self.phases)
         traci.trafficlight.setCompleteRedYellowGreenDefinition(self.id, logic)
 
@@ -69,7 +87,7 @@ class TrafficSignal:
         self.step_count=0
 
     def time_to_act(self) :
-        if 'g' in self.phases[self.phase].state or 'G' in self.phases[self.phase].state : # if current phase is green phase
+        if 'y' not in self.phases[self.phase].state : # if current phase is green phase
             if self.time_on_phase >= self.min_green[self.phase] : # if elapsed time of green excess minimum green time
                 return True 
             else :
@@ -78,7 +96,7 @@ class TrafficSignal:
             return False
 
     def regular_obs(self):
-        if 'y' in self.phases[self.phase].state :
+        if 'y' not in self.phases[self.phase].state :
             return False
         else :
             if self.time_on_phase % 4 == 0 :
@@ -91,10 +109,9 @@ class TrafficSignal:
         Return the current observation for each traffic signal
         """
         phase_id = [1 if self.phase//2 == i else 0 for i in range(self.num_green_phases)]  #one-hot encoding
-        elapsed = self.time_on_phase / self.max_green[self.phase]
+        elapsed = self.time_on_phase
         density = self.get_lanes_density()
-        queue = self.get_lanes_queue()
-        observations = phase_id + [elapsed] + density + queue
+        observations = phase_id + [elapsed] + density
         return observations
         
     @property
@@ -103,7 +120,7 @@ class TrafficSignal:
 
     def phase_system(self):
         if 'y' in self.phases[self.phase].state :
-            if self.time_on_phase < self.yellow_time :
+            if self.time_on_phase < self.min_green[self.phase] :
                 traci.trafficlight.setPhase(self.id, self.phase)
                 self.time_on_phase += 1
             else :
@@ -138,63 +155,19 @@ class TrafficSignal:
         #     print('ID : {0} Action : {1}    phase : {2} time_on_phase/current_min_green  : {3}/{4}'
         #               .format(self.id, action, self.phase, self.time_on_phase, self.min_green[self.phase]))
 
-    def _compute_edges(self):
-        """
-        return: Dict green phase to edge id
-        """
-        return {p : self.lanes[p*2:p*2+2] for p in range(self.num_green_phases)}  # two lanes per edge
-
-    def _compute_edges_capacity(self):
-        vehicle_size_min_gap = 7.5  # 5(vehSize) + 2.5(minGap)
-        return {
-            p : sum([traci.lane.getLength(lane) for lane in self.edges[p]]) / vehicle_size_min_gap for p in range(self.num_green_phases)
-        }
-
-    # def get_density(self):
-    #     return [sum([traci.lane.getLastStepVehicleNumber(lane) for lane in self.edges[p]]) / self.edges_capacity[p] for p in range(self.num_green_phases)]
-
-    # def get_stopped_density(self):
-    #     return [sum([traci.lane.getLastStepHaltingNumber(lane) for lane in self.edges[p]]) / self.edges_capacity[p] for p in range(self.num_green_phases)]
-
-    def get_stopped_vehicles_num(self):
-        return [sum([traci.lane.getLastStepHaltingNumber(lane) for lane in self.edges[p]]) for p in range(self.num_green_phases)]
-
-    def get_waiting_time(self):
-        wait_time_per_road = []
-        for p in range(self.num_green_phases):
-            veh_list = self._get_veh_list(p)
-            wait_time = 0.0
-            for veh in veh_list:
-                veh_lane = self.get_edge_id(traci.vehicle.getLaneID(veh))
-                acc = traci.vehicle.getAccumulatedWaitingTime(veh)
-                if veh not in self.env.vehicles:
-                    self.env.vehicles[veh] = {veh_lane: acc}
-                else:
-                    self.env.vehicles[veh][veh_lane] = acc - sum([self.env.vehicles[veh][lane] for lane in self.env.vehicles[veh].keys() if lane != veh_lane])
-                wait_time += self.env.vehicles[veh][veh_lane]
-            wait_time_per_road.append(wait_time)
-        return wait_time_per_road
-
     def get_lanes_density(self):
-        vehicle_size_min_gap = 7.5  # 5(vehSize) + 2.5(minGap)
-        return [min(1, traci.lane.getLastStepVehicleNumber(lane) / (traci.lane.getLength(lane) / vehicle_size_min_gap)) for lane in self.lanes]
-    
-    def get_lanes_queue(self):
-        vehicle_size_min_gap = 7.5  # 5(vehSize) + 2.5(minGap)
-        return [min(1, traci.lane.getLastStepHaltingNumber(lane) / (traci.lane.getLength(lane) / vehicle_size_min_gap)) for lane in self.lanes]
+        density = []
+        for key in self.lanes :
+            sum = 0
+            for lane in self.lanes[key] :
+                sum += traci.lane.getLastStepVehicleNumber(lane)
+            density.append(sum)
+        return density
 
-    @staticmethod
-    def get_edge_id(lane):
-        ''' Get edge Id from lane Id
-        :param lane: id of the lane
-        :return: the edge id of the lane
-        '''
-        return lane[:-2]
-    
-    def _get_veh_list(self, p):
-        veh_list = []
-        for lane in self.edges[p]:
-            veh_list += traci.lane.getLastStepVehicleIDs(lane)
-        return veh_list
-
+    def get_lanes_queue_sum(self):
+        sum = 0
+        for key in self.lanes :
+            for lane in self.lanes[key] :
+                sum += traci.lane.getLastStepHaltingNumber(lane)
+        return sum
     

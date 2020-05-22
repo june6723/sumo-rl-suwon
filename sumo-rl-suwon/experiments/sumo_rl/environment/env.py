@@ -36,7 +36,7 @@ class SumoEnvironment(MultiAgentEnv):
     """
     
     def __init__(self, net_file, route_file, out_csv_path=None,out_csv_name=None, use_gui=False, num_seconds=20000, max_depart_delay=100000,
-                 time_to_load_vehicles=0, delta_time=4, single_agent=False):
+                 time_to_load_vehicles=0, single_agent=False):
 
         self._net = net_file
         self._route = route_file
@@ -49,16 +49,14 @@ class SumoEnvironment(MultiAgentEnv):
 
         self.single_agent = single_agent
         self.ts_ids = traci.trafficlight.getIDList()
-        self.lanes_per_ts = len(set(traci.trafficlight.getControlledLanes(self.ts_ids[0])))
+        # self.lanes_per_ts = len(set(traci.trafficlight.getControlledLanes(self.ts_ids[0])))
         self.traffic_signals = dict()
         self.vehicles = dict()
         self.last_measure = dict()  # used to reward function remember last measure
         self.last_reward = {i: 0 for i in self.ts_ids}
         self.sim_max_time = num_seconds
         self.time_to_load_vehicles = time_to_load_vehicles  # number of simulation seconds ran in reset() before learning starts
-        self.delta_time = delta_time  # seconds on sumo at each step
         self.max_depart_delay = max_depart_delay  # Max wait time to insert a vehicle
-        self.yellow_time = 2
         
         # addition
         self.passed_num_of_veh_in_ts = dict()
@@ -67,29 +65,15 @@ class SumoEnvironment(MultiAgentEnv):
         self.wait_veh = dict()
         self.last_step_waiting_time = 0
 
-        input = [{'gneE1_0':'gneE11_0'}, {'-gneE9_0':'gneE3_0'}, {'gneE1_0':'gneE10_0'}, {'-gneE9_0':'gneE2_0'}] # manually
-        self.in_lane = []
-        self.out_lane = []
-        for index in input : 
-            for key, value in index.items() :
-                if key not in self.in_lane :    
-                    self.in_lane.append(key)
-                if value not in self.out_lane :
-                    self.out_lane.append(value)  
-
-        """
-        Default observation space is a vector R^(#greenPhases + 1 + 2 * #lanes)
-        s = [current phase one-hot encoded, elapsedTime / maxGreenTime, density for each lane, queue for each lane]
-        You can change this by modifing self.observation_space and the method _compute_observations()
-
-        Action space is which green phase is going to be open for the next delta_time seconds
-        """
-        # self.observation_space = spaces.Box(low=np.zeros(self.num_green_phases + 1 + 2*self.lanes_per_ts), high=np.ones(self.num_green_phases + 1 + 2*self.lanes_per_ts))
-        # self.action_space = spaces.Discrete(2)
-
-        self.reward_range = (-float('inf'), float('inf'))
-        self.metadata = {}
-        self.spec = ''
+        # input = [{'gneE1_0':'gneE11_0'}, {'-gneE9_0':'gneE3_0'}, {'gneE1_0':'gneE10_0'}, {'-gneE9_0':'gneE2_0'}] # manually
+        # self.in_lane = []
+        # self.out_lane = []
+        # for index in input : 
+        #     for key, value in index.items() :
+        #         if key not in self.in_lane :    
+        #             self.in_lane.append(key)
+        #         if value not in self.out_lane :
+        #             self.out_lane.append(value)  
 
         self.run = 0
         self.metrics = []
@@ -100,40 +84,43 @@ class SumoEnvironment(MultiAgentEnv):
 
     # Reset before start iterations    
     def reset(self):
+        # if self.run != 0:
+        #     self.save_csv(self.out_csv_path, self.out_csv_name, self.run)
+        #     traci.close()
+
+        # sumo_cmd = [self._sumo_binary,
+        #              '-n', self._net,
+        #              '-r', self._route[self.run%3],
+        #              '--max-depart-delay', str(self.max_depart_delay), 
+        #              '--waiting-time-memory', '10000', 
+        #              '--random']  
+        # print(self._route[self.run%3])
         if self.run != 0:
             self.save_csv(self.out_csv_path, self.out_csv_name, self.run)
             traci.close()
-
+        self.run += 1
+        self.metrics = []
+        # origin
         sumo_cmd = [self._sumo_binary,
                      '-n', self._net,
-                     '-r', self._route[self.run%3],
+                     '-r', self._route,
                      '--max-depart-delay', str(self.max_depart_delay), 
                      '--waiting-time-memory', '10000', 
-                     '--random']  
-        print(self._route[self.run%3])
+                     '--random']
         
-        self.run += 1
         self.metrics = []
         self.passed_num_of_veh_in_ts.clear()
         self.pass_veh_between_intersection_start.clear()
         self.pass_veh_between_intersection_end = []
         self.last_step_waiting_time = 0
         self.wait_veh.clear()
-        #origin
-        # sumo_cmd = [self._sumo_binary,
-        #              '-n', self._net,
-        #              '-r', self._route,
-        #              '--max-depart-delay', str(self.max_depart_delay), 
-        #              '--waiting-time-memory', '10000', 
-        #              '--random']
 
-        
         if self.use_gui:
             sumo_cmd.append('--start')
         traci.start(sumo_cmd)
 
         for ts in self.ts_ids:
-            self.traffic_signals[ts] = TrafficSignal(self, ts, self.delta_time, self.yellow_time)
+            self.traffic_signals[ts] = TrafficSignal(self, ts)
             self.passed_num_of_veh_in_ts[ts] = 0
             self.last_measure[ts] = 0.0
 
@@ -153,7 +140,7 @@ class SumoEnvironment(MultiAgentEnv):
         """
         Return current simulation second on SUMO
         """
-        return traci.simulation.getCurrentTime()/1000  # milliseconds to seconds
+        return traci.simulation.getTime()
 
     def step(self, action):
         # act
@@ -165,12 +152,11 @@ class SumoEnvironment(MultiAgentEnv):
         self._sumo_step()
            
         # observe new state and reward
-        observation = self._compute_observations() if self.sim_step <= self.sim_max_time else self._compute_last_observations()
-        reward = self._compute_rewards() if self.sim_step <= self.sim_max_time else self._queue_last_reward()
+        observation = self._compute_observations()
+        reward = self._compute_rewards()
         done = {'__all__': self.sim_step > self.sim_max_time}
         info = self._compute_step_info()
         self.metrics.append(info)
-        self.last_reward = reward
 
         if self.single_agent:
             return observation[self.ts_ids[0]], reward[self.ts_ids[0]], done['__all__'], {}
@@ -183,50 +169,21 @@ class SumoEnvironment(MultiAgentEnv):
         """
         observations = {}
         for ts in self.ts_ids:
-            if self.traffic_signals[ts].time_to_act() or self.traffic_signals[ts].regular_obs() :
+            if self.traffic_signals[ts].time_to_act() or self.sim_step > self.sim_max_time :
                 observations[ts] = self.traffic_signals[ts]._compute_observation()
         return observations
 
-    def _compute_last_observations(self):
-        """
-        Return the current observation for each traffic signal
-        """
-        observations = {}
-        for ts in self.ts_ids:
-            observations[ts] = self.traffic_signals[ts]._compute_observation()
-        return observations    
-
     def _compute_rewards(self):
-        # return self._waiting_time_reward()
-        return self._queue_reward() 
-        #return self._waiting_time_reward2()
-        #return self._queue_average_reward()
-
-    def _queue_reward(self):
         rewards = {}
         for ts in self.ts_ids:
-            if self.traffic_signals[ts].time_to_act() or self.traffic_signals[ts].regular_obs() :
-                rewards[ts] = - (sum(self.traffic_signals[ts].get_stopped_vehicles_num()))**2
+            if self.traffic_signals[ts].time_to_act() or self.sim_step > self.sim_max_time :
+                rewards[ts] = -1 * self.traffic_signals[ts].get_lanes_queue_sum()
         return rewards
-
-    def _queue_last_reward(self):
-        rewards = {}
-        for ts in self.ts_ids:
-            rewards[ts] = - (sum(self.traffic_signals[ts].get_stopped_vehicles_num()))**2
-        return rewards
-
-    def _waiting_time_reward(self):
-        rewards = {}
-        for ts in self.ts_ids:
-            ts_wait = sum(self.traffic_signals[ts].get_waiting_time())
-            rewards[ts] = self.last_measure[ts] - ts_wait
-            self.last_measure[ts] = ts_wait
-        return rewards
-            
+        
     def _sumo_step(self):
         traci.simulationStep()  
-        self._get_passed_veh_in_ts()  
-        self._get_time_of_passveh_in_intersection()
+        # self._get_passed_veh_in_ts()  
+        # self._get_time_of_passveh_in_intersection()
 
     def step_stopped(self):
         veh_list = traci.vehicle.getIDList()
@@ -251,20 +208,20 @@ class SumoEnvironment(MultiAgentEnv):
             'step_wait_time' : self.step_wait_time(),
             'accumulated_wait_time' : sum(self.wait_veh.values())
         }
-        for ts in self.ts_ids :
-            info.update({'{0}_passed'.format(ts) : self.passed_num_of_veh_in_ts[ts]})
+        # for ts in self.ts_ids :
+        #     info.update({'{0}_passed'.format(ts) : self.passed_num_of_veh_in_ts[ts]})
         return info
 
     def _compute_step_info_before_rl(self):
         info = {
-            'step_time': self.sim_step-1,
+            'step_time': self.sim_step,
             # 'reward': self.last_reward[self.ts_ids[0]],
             'step_stopped': self.step_stopped(),
             'step_wait_time' : self.step_wait_time(),
             'accumulated_wait_time' : sum(self.wait_veh.values())
         }
-        for ts in self.ts_ids :
-            info.update({'{0}_passed'.format(ts) : self.passed_num_of_veh_in_ts[ts]})
+        # for ts in self.ts_ids :
+        #     info.update({'{0}_passed'.format(ts) : self.passed_num_of_veh_in_ts[ts]})
         return info
 
     def _compute_phase_duration(self):
@@ -335,7 +292,6 @@ class SumoEnvironment(MultiAgentEnv):
             df4 = pd.concat([df2, df3])
             df4.to_csv(out_csv_path + out_csv_name + '_Phaseduration' +'_run{}'.format(run) + '.csv', index=False)
 
-            df5 = pd.DataFrame(self.pass_veh_between_intersection_end)
-            
-            df5.to_csv(out_csv_path + out_csv_name + '_between_intersection' + '_run{}'.format(run) + '.csv', index=False)
+            # df5 = pd.DataFrame(self.pass_veh_between_intersection_end)
+            # df5.to_csv(out_csv_path + out_csv_name + '_between_intersection' + '_run{}'.format(run) + '.csv', index=False)
         

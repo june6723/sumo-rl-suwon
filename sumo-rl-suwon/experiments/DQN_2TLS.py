@@ -33,14 +33,12 @@ def policy_mapping(id):
 if __name__ == '__main__':
     ray.init()
 
-    register_env("2TLS", lambda _: SumoEnvironment(net_file='nets/Research/case03/intersection.net.xml',
-                                                    route_file=['nets/Research/case03/test1.rou.xml',
-                                                                'nets/Research/case03/test2.rou.xml',
-                                                                'nets/Research/case03/test3.rou.xml'],
-                                                    out_csv_path='outputs/grad/',
+    register_env("2TLS", lambda _: SumoEnvironment(net_file='/home/sonic/Desktop/sumo-rl-suwon/sumo-rl-suwon/experiments/nets/suwon/osm_rl.net.xml',
+                                                    route_file='/home/sonic/Desktop/sumo-rl-suwon/sumo-rl-suwon/experiments/nets/suwon/osm.rou.xml',
+                                                    out_csv_path='outputs/',
                                                     out_csv_name='DQN',
                                                     use_gui=False,
-                                                    num_seconds=21600,
+                                                    num_seconds=1000,
                                                     time_to_load_vehicles=300,
                                                     max_depart_delay=0)
                     )
@@ -48,8 +46,10 @@ if __name__ == '__main__':
     trainer = DQNTrainer(env="2TLS", config={
         "multiagent": {
             "policy_graphs": {
-                'left': (DQNTFPolicy, spaces.Box(low=np.zeros(21), high=np.ones(21)), spaces.Discrete(2), {}),
-                'right': (DQNTFPolicy, spaces.Box(low=np.zeros(21), high=np.ones(21)), spaces.Discrete(2), {})
+                '3210041371': (DQNTFPolicy, spaces.Box(low=np.zeros(13), high=np.array(['inf']*13)), spaces.Discrete(2), {}),
+                '452397025': (DQNTFPolicy, spaces.Box(low=np.zeros(14), high=np.array(['inf']*14)), spaces.Discrete(2), {}),
+                '4708662059': (DQNTFPolicy, spaces.Box(low=np.zeros(17), high=np.array(['inf']*17)), spaces.Discrete(2), {}),
+                '5870232715': (DQNTFPolicy, spaces.Box(low=np.zeros(10), high=np.array(['inf']*10)), spaces.Discrete(2), {})
             },
             "policy_mapping_fn": policy_mapping  # Traffic lights are always controlled by this policy
         },
