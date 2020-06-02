@@ -86,6 +86,8 @@ class TrafficSignal:
 
         self.step_count=0
 
+        self.observation_log=[]
+
     def time_to_act(self) :
         if 'y' not in self.phases[self.phase].state : # if current phase is green phase
             if self.time_on_phase >= self.min_green[self.phase] : # if elapsed time of green excess minimum green time
